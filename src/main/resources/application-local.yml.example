@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    password: your-mysql-password
+
+app:
+  jwt:
+    secret: your-jwt-secret-at-least-32-bytes
