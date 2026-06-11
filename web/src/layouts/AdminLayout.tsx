@@ -16,12 +16,12 @@ import { logout } from '@/api/auth'
 const { Sider, Header, Content } = Layout
 
 const NAV_ITEMS = [
-  { key: '/system/user', icon: <UserOutlined />, label: '用户管理', perm: 'system:user:list' },
-  { key: '/system/role', icon: <TeamOutlined />, label: '角色管理', perm: 'system:role:list' },
-  { key: '/system/menu', icon: <MenuOutlined />, label: '菜单管理', perm: 'system:menu:list' },
-  { key: '/system/dept', icon: <ApartmentOutlined />, label: '部门管理', perm: 'system:dept:list' },
-  { key: '/system/dict', icon: <BookOutlined />, label: '字典管理', perm: 'system:dict:list' },
-  { key: '/system/log', icon: <FileTextOutlined />, label: '操作日志', perm: 'system:operlog:list' },
+  { key: '/system/users', icon: <UserOutlined />, label: '用户管理', perm: 'system:user:list' },
+  { key: '/system/roles', icon: <TeamOutlined />, label: '角色管理', perm: 'system:role:list' },
+  { key: '/system/menus', icon: <MenuOutlined />, label: '菜单管理', perm: 'system:menu:list' },
+  { key: '/system/depts', icon: <ApartmentOutlined />, label: '部门管理', perm: 'system:dept:list' },
+  { key: '/system/dicts', icon: <BookOutlined />, label: '字典管理', perm: 'system:dict:list' },
+  { key: '/system/operation-logs', icon: <FileTextOutlined />, label: '操作日志', perm: 'system:operlog:list' },
 ]
 
 export default function AdminLayout() {

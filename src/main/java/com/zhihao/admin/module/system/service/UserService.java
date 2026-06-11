@@ -6,6 +6,7 @@ import com.zhihao.admin.common.api.PageResult;
 import com.zhihao.admin.common.exception.BusinessException;
 import com.zhihao.admin.module.system.dto.PasswordResetRequest;
 import com.zhihao.admin.module.system.dto.UserCreateRequest;
+import com.zhihao.admin.module.system.dto.UserDetailResponse;
 import com.zhihao.admin.module.system.dto.UserQuery;
 import com.zhihao.admin.module.system.dto.UserUpdateRequest;
 import com.zhihao.admin.module.system.entity.SysUser;
@@ -27,13 +28,26 @@ public class UserService {
     private final SysUserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public PageResult<SysUser> page(UserQuery query) {
+    public PageResult<UserDetailResponse> page(UserQuery query) {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<SysUser>()
                 .like(StringUtils.hasText(query.getUsername()), SysUser::getUsername, query.getUsername())
                 .like(StringUtils.hasText(query.getPhone()), SysUser::getPhone, query.getPhone())
                 .eq(query.getStatus() != null, SysUser::getStatus, query.getStatus())
                 .orderByDesc(SysUser::getCreateTime);
-        return PageResult.from(userMapper.selectPage(Page.of(query.getPageNum(), query.getPageSize()), wrapper));
+        Page<SysUser> page = userMapper.selectPage(Page.of(query.getPageNum(), query.getPageSize()), wrapper);
+        Page<UserDetailResponse> mapped = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+        mapped.setRecords(page.getRecords().stream()
+                .map(u -> UserDetailResponse.from(u, null))
+                .toList());
+        return PageResult.from(mapped);
+    }
+
+    public UserDetailResponse getDetail(Long id) {
+        SysUser user = requireUser(id);
+        List<Long> roleIds = userRoleMapper.selectList(
+                new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, id)
+        ).stream().map(SysUserRole::getRoleId).toList();
+        return UserDetailResponse.from(user, roleIds);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -66,7 +80,12 @@ public class UserService {
         replaceRoles(id, request.roleIds());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
+        SysUser user = requireUser(id);
+        user.setUsername(user.getUsername() + ":" + user.getId());
+        userMapper.updateById(user);
+        userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, id));
         userMapper.deleteById(id);
     }
 

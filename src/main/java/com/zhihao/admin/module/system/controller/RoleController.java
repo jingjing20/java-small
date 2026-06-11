@@ -29,7 +29,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('system:role:list')")
+    @PreAuthorize("hasAnyAuthority('system:role:list', 'system:user:add', 'system:user:edit')")
     public ApiResponse<PageResult<SysRole>> page(@Valid PageQuery query) {
         return ApiResponse.ok(roleService.page(query));
     }

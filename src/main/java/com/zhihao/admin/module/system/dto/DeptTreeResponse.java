@@ -11,6 +11,8 @@ public class DeptTreeResponse {
     private Long parentId;
     private String deptName;
     private Integer sort;
+    private String leader;
+    private String phone;
     private Integer status;
     private List<DeptTreeResponse> children = new ArrayList<>();
 
@@ -20,6 +22,8 @@ public class DeptTreeResponse {
         response.setParentId(dept.getParentId());
         response.setDeptName(dept.getDeptName());
         response.setSort(dept.getSort());
+        response.setLeader(dept.getLeader());
+        response.setPhone(dept.getPhone());
         response.setStatus(dept.getStatus());
         return response;
     }

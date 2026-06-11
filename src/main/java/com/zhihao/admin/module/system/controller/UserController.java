@@ -5,9 +5,9 @@ import com.zhihao.admin.common.api.PageResult;
 import com.zhihao.admin.common.log.OperationLog;
 import com.zhihao.admin.module.system.dto.PasswordResetRequest;
 import com.zhihao.admin.module.system.dto.UserCreateRequest;
+import com.zhihao.admin.module.system.dto.UserDetailResponse;
 import com.zhihao.admin.module.system.dto.UserQuery;
 import com.zhihao.admin.module.system.dto.UserUpdateRequest;
-import com.zhihao.admin.module.system.entity.SysUser;
 import com.zhihao.admin.module.system.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,14 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('system:user:list')")
-    public ApiResponse<PageResult<SysUser>> page(@Valid UserQuery query) {
-        PageResult<SysUser> res = userService.page(query);
-        return ApiResponse.ok(res);
+    public ApiResponse<PageResult<UserDetailResponse>> page(@Valid UserQuery query) {
+        return ApiResponse.ok(userService.page(query));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('system:user:list')")
+    public ApiResponse<UserDetailResponse> detail(@PathVariable Long id) {
+        return ApiResponse.ok(userService.getDetail(id));
     }
 
     @PostMapping

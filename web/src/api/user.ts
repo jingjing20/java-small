@@ -2,6 +2,7 @@ import request from './request'
 import type {
   PageResult,
   SysUser,
+  UserDetail,
   UserQuery,
   UserCreateRequest,
   UserUpdateRequest,
@@ -9,6 +10,9 @@ import type {
 
 export const getUsers = (params: UserQuery) =>
   request.get<unknown, PageResult<SysUser>>('/system/users', { params })
+
+export const getUserDetail = (id: number) =>
+  request.get<unknown, UserDetail>(`/system/users/${id}`)
 
 export const createUser = (data: UserCreateRequest) =>
   request.post<unknown, number>('/system/users', data, { successMessage: '新增成功' })

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Form, Input, Button, Card, Typography } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -8,13 +9,19 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { setToken, setUser } = useAuthStore()
   const [form] = Form.useForm()
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (values: { username: string; password: string }) => {
-    const res = await login(values)
-    setToken(res.token)
-    const me = await getMe()
-    setUser(me)
-    navigate('/', { replace: true })
+    setLoading(true)
+    try {
+      const res = await login(values)
+      setToken(res.token)
+      const me = await getMe()
+      setUser(me)
+      navigate('/', { replace: true })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,7 +46,7 @@ export default function LoginPage() {
             <Input.Password prefix={<LockOutlined />} placeholder="密码" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" block loading={loading}>
               登录
             </Button>
           </Form.Item>

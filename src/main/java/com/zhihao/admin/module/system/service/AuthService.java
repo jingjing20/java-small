@@ -8,6 +8,7 @@ import com.zhihao.admin.security.JwtService;
 import com.zhihao.admin.security.LoginUser;
 import com.zhihao.admin.security.SecurityUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +22,15 @@ public class AuthService {
     private final JwtService jwtService;
 
     public LoginResponse login(LoginRequest request) {
-        LoginUser user = (LoginUser) userDetailsService.loadUserByUsername(request.username());
-        if (!user.isEnabled()) {
-            throw new BusinessException("user is disabled");
-        }
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        try {
+            LoginUser user = (LoginUser) userDetailsService.loadUserByUsername(request.username());
+            if (!user.isEnabled() || !passwordEncoder.matches(request.password(), user.getPassword())) {
+                throw new BusinessException("invalid username or password");
+            }
+            return new LoginResponse(jwtService.createToken(user), TOKEN_TYPE);
+        } catch (UsernameNotFoundException ex) {
             throw new BusinessException("invalid username or password");
         }
-        return new LoginResponse(jwtService.createToken(user), TOKEN_TYPE);
     }
 
     public CurrentUserResponse me() {

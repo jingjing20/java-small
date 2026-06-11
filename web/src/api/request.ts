@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { message } from 'antd'
+import { useAuthStore } from '@/stores/authStore'
 
 declare module 'axios' {
   interface AxiosRequestConfig {
@@ -32,7 +33,7 @@ request.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
+      useAuthStore.getState().clear()
       window.location.href = '/login'
       return Promise.reject(error)
     }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Table,
   Button,
@@ -8,7 +8,6 @@ import {
   Select,
   Modal,
   Popconfirm,
-  Tag,
   Tree,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
@@ -24,8 +23,8 @@ import {
 import { getMenuTree } from '@/api/menu'
 import type { SysRole, RoleRequest, MenuTreeNode } from '@/api/types'
 import AuthButton from '@/components/AuthButton'
-
-const PAGE_SIZE = 10
+import StatusTag from '@/components/StatusTag'
+import { DEFAULT_PAGE_SIZE, usePageTable } from '@/hooks/usePageTable'
 
 function toTreeData(nodes: MenuTreeNode[]): object[] {
   return nodes.map((n) => ({
@@ -36,35 +35,34 @@ function toTreeData(nodes: MenuTreeNode[]): object[] {
 }
 
 export default function RolePage() {
-  const [data, setData] = useState<SysRole[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [pageNum, setPageNum] = useState(1)
+  const { data, total, loading, query, setQuery, fetchData } = usePageTable(
+    getRoles,
+    { pageNum: 1, pageSize: DEFAULT_PAGE_SIZE },
+  )
   const [menuTree, setMenuTree] = useState<object[]>([])
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState(false)
   const [editingRole, setEditingRole] = useState<SysRole | null>(null)
   const [menuModalOpen, setMenuModalOpen] = useState(false)
+  const [menuConfirmLoading, setMenuConfirmLoading] = useState(false)
   const [menuRoleId, setMenuRoleId] = useState<number | null>(null)
   const [checkedKeys, setCheckedKeys] = useState<number[]>([])
 
   const [form] = Form.useForm()
 
-  const fetchData = useCallback(async (page: number) => {
-    setLoading(true)
-    try {
-      const res = await getRoles({ pageNum: page, pageSize: PAGE_SIZE })
-      setData(res.records)
-      setTotal(res.total)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
   useEffect(() => {
-    fetchData(pageNum)
-    getMenuTree().then((tree) => setMenuTree(toTreeData(tree)))
-  }, [fetchData, pageNum])
+    fetchData(query)
+  }, [fetchData, query])
+
+  const [menuTreeLoaded, setMenuTreeLoaded] = useState(false)
+
+  const ensureMenuTree = async () => {
+    if (menuTreeLoaded) return
+    const tree = await getMenuTree()
+    setMenuTree(toTreeData(tree))
+    setMenuTreeLoaded(true)
+  }
 
   const openCreate = () => {
     setEditingRole(null)
@@ -86,21 +84,27 @@ export default function RolePage() {
 
   const handleModalOk = async () => {
     const values: RoleRequest = await form.validateFields()
-    if (editingRole) {
-      await updateRole(editingRole.id, values)
-    } else {
-      await createRole(values)
+    setConfirmLoading(true)
+    try {
+      if (editingRole) {
+        await updateRole(editingRole.id, values)
+      } else {
+        await createRole(values)
+      }
+      setModalOpen(false)
+      fetchData(query)
+    } finally {
+      setConfirmLoading(false)
     }
-    setModalOpen(false)
-    fetchData(pageNum)
   }
 
   const handleDelete = async (id: number) => {
     await deleteRole(id)
-    fetchData(pageNum)
+    fetchData(query)
   }
 
   const openMenuModal = async (id: number) => {
+    await ensureMenuTree()
     setMenuRoleId(id)
     const ids = await getRoleMenuIds(id)
     setCheckedKeys(ids)
@@ -108,8 +112,13 @@ export default function RolePage() {
   }
 
   const handleMenuOk = async () => {
-    if (menuRoleId) await updateRoleMenus(menuRoleId, checkedKeys)
-    setMenuModalOpen(false)
+    setMenuConfirmLoading(true)
+    try {
+      if (menuRoleId) await updateRoleMenus(menuRoleId, checkedKeys)
+      setMenuModalOpen(false)
+    } finally {
+      setMenuConfirmLoading(false)
+    }
   }
 
   const columns: ColumnsType<SysRole> = [
@@ -120,7 +129,7 @@ export default function RolePage() {
       title: '状态',
       dataIndex: 'status',
       width: 80,
-      render: (v: number) => <Tag color={v === 1 ? 'success' : 'error'}>{v === 1 ? '启用' : '禁用'}</Tag>,
+      render: (v: number) => <StatusTag value={v} />,
     },
     { title: '创建时间', dataIndex: 'createTime', width: 170 },
     {
@@ -158,11 +167,11 @@ export default function RolePage() {
         dataSource={data}
         loading={loading}
         pagination={{
-          current: pageNum,
-          pageSize: PAGE_SIZE,
+          current: query.pageNum,
+          pageSize: query.pageSize,
           total,
           showTotal: (t) => `共 ${t} 条`,
-          onChange: (page) => setPageNum(page),
+          onChange: (page) => setQuery((q) => ({ ...q, pageNum: page })),
         }}
       />
 
@@ -171,6 +180,7 @@ export default function RolePage() {
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={() => setModalOpen(false)}
+        confirmLoading={confirmLoading}
         destroyOnHidden
       >
         <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
@@ -200,14 +210,19 @@ export default function RolePage() {
         open={menuModalOpen}
         onOk={handleMenuOk}
         onCancel={() => setMenuModalOpen(false)}
+        confirmLoading={menuConfirmLoading}
         width={480}
         destroyOnHidden
       >
         <Tree
           checkable
+          checkStrictly
           treeData={menuTree}
           checkedKeys={checkedKeys}
-          onCheck={(keys) => setCheckedKeys(keys as number[])}
+          onCheck={(checked) => {
+            const keys = Array.isArray(checked) ? checked : checked.checked
+            setCheckedKeys(keys as number[])
+          }}
           defaultExpandAll
         />
       </Modal>

@@ -159,7 +159,15 @@ VALUES
 (206, 102, 'Role Edit', 'B', NULL, NULL, 'system:role:edit', 2, 1, 1, NOW(), NOW(), 0),
 (207, 102, 'Role Delete', 'B', NULL, NULL, 'system:role:delete', 3, 1, 1, NOW(), NOW(), 0),
 (208, 102, 'Role Menus', 'B', NULL, NULL, 'system:role:menus', 4, 1, 1, NOW(), NOW(), 0),
-(209, 105, 'Dict Add', 'B', NULL, NULL, 'system:dict:add', 1, 1, 1, NOW(), NOW(), 0);
+(209, 105, 'Dict Add', 'B', NULL, NULL, 'system:dict:add', 1, 1, 1, NOW(), NOW(), 0),
+(210, 103, 'Menu Add', 'B', NULL, NULL, 'system:menu:add', 1, 1, 1, NOW(), NOW(), 0),
+(211, 103, 'Menu Edit', 'B', NULL, NULL, 'system:menu:edit', 2, 1, 1, NOW(), NOW(), 0),
+(212, 103, 'Menu Delete', 'B', NULL, NULL, 'system:menu:delete', 3, 1, 1, NOW(), NOW(), 0),
+(213, 104, 'Dept Add', 'B', NULL, NULL, 'system:dept:add', 1, 1, 1, NOW(), NOW(), 0),
+(214, 104, 'Dept Edit', 'B', NULL, NULL, 'system:dept:edit', 2, 1, 1, NOW(), NOW(), 0),
+(215, 104, 'Dept Delete', 'B', NULL, NULL, 'system:dept:delete', 3, 1, 1, NOW(), NOW(), 0),
+(216, 105, 'Dict Edit', 'B', NULL, NULL, 'system:dict:edit', 2, 1, 1, NOW(), NOW(), 0),
+(217, 105, 'Dict Delete', 'B', NULL, NULL, 'system:dict:delete', 3, 1, 1, NOW(), NOW(), 0);
 
 INSERT IGNORE INTO sys_role_menu (id, role_id, menu_id)
 SELECT id, 1, id FROM sys_menu WHERE deleted = 0;

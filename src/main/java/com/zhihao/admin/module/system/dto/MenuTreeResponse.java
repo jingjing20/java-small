@@ -14,7 +14,10 @@ public class MenuTreeResponse {
     private String path;
     private String component;
     private String permission;
+    private String icon;
     private Integer sort;
+    private Integer visible;
+    private Integer status;
     private List<MenuTreeResponse> children = new ArrayList<>();
 
     public static MenuTreeResponse from(SysMenu menu) {
@@ -26,7 +29,10 @@ public class MenuTreeResponse {
         response.setPath(menu.getPath());
         response.setComponent(menu.getComponent());
         response.setPermission(menu.getPermission());
+        response.setIcon(menu.getIcon());
         response.setSort(menu.getSort());
+        response.setVisible(menu.getVisible());
+        response.setStatus(menu.getStatus());
         return response;
     }
 }

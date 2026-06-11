@@ -12,8 +12,11 @@ import com.zhihao.admin.module.system.service.DictService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +42,22 @@ public class DictController {
         return ApiResponse.ok(dictService.createType(request));
     }
 
+    @PutMapping("/dict-types/{id}")
+    @PreAuthorize("hasAuthority('system:dict:edit')")
+    @OperationLog(title = "DictType", businessType = "update")
+    public ApiResponse<Void> updateType(@PathVariable Long id, @Valid @RequestBody DictTypeRequest request) {
+        dictService.updateType(id, request);
+        return ApiResponse.ok();
+    }
+
+    @DeleteMapping("/dict-types/{id}")
+    @PreAuthorize("hasAuthority('system:dict:delete')")
+    @OperationLog(title = "DictType", businessType = "delete")
+    public ApiResponse<Void> deleteType(@PathVariable Long id) {
+        dictService.deleteType(id);
+        return ApiResponse.ok();
+    }
+
     @GetMapping("/dict-data")
     @PreAuthorize("hasAuthority('system:dict:list')")
     public ApiResponse<PageResult<SysDictData>> dataPage(@Valid PageQuery query,
@@ -51,5 +70,21 @@ public class DictController {
     @OperationLog(title = "DictData", businessType = "create")
     public ApiResponse<Long> createData(@Valid @RequestBody DictDataRequest request) {
         return ApiResponse.ok(dictService.createData(request));
+    }
+
+    @PutMapping("/dict-data/{id}")
+    @PreAuthorize("hasAuthority('system:dict:edit')")
+    @OperationLog(title = "DictData", businessType = "update")
+    public ApiResponse<Void> updateData(@PathVariable Long id, @Valid @RequestBody DictDataRequest request) {
+        dictService.updateData(id, request);
+        return ApiResponse.ok();
+    }
+
+    @DeleteMapping("/dict-data/{id}")
+    @PreAuthorize("hasAuthority('system:dict:delete')")
+    @OperationLog(title = "DictData", businessType = "delete")
+    public ApiResponse<Void> deleteData(@PathVariable Long id) {
+        dictService.deleteData(id);
+        return ApiResponse.ok();
     }
 }

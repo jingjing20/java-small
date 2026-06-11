@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Table,
   Button,
@@ -8,7 +8,6 @@ import {
   Select,
   Modal,
   Popconfirm,
-  Tag,
   Row,
   Col,
   TreeSelect,
@@ -17,6 +16,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import {
   getUsers,
+  getUserDetail,
   createUser,
   updateUser,
   deleteUser,
@@ -26,8 +26,8 @@ import { getDeptTree } from '@/api/dept'
 import { getRoles } from '@/api/role'
 import type { SysUser, UserQuery, DeptTreeNode, SysRole } from '@/api/types'
 import AuthButton from '@/components/AuthButton'
-
-const PAGE_SIZE = 10
+import StatusTag from '@/components/StatusTag'
+import { DEFAULT_PAGE_SIZE, usePageTable } from '@/hooks/usePageTable'
 
 function toDeptTreeData(nodes: DeptTreeNode[]): object[] {
   return nodes.map((n) => ({
@@ -38,72 +38,82 @@ function toDeptTreeData(nodes: DeptTreeNode[]): object[] {
 }
 
 export default function UserPage() {
-  const [data, setData] = useState<SysUser[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [query, setQuery] = useState<UserQuery>({ pageNum: 1, pageSize: PAGE_SIZE })
+  const { data, total, loading, query, setQuery, fetchData } = usePageTable(
+    getUsers,
+    { pageNum: 1, pageSize: DEFAULT_PAGE_SIZE },
+  )
   const [deptTree, setDeptTree] = useState<object[]>([])
   const [roles, setRoles] = useState<SysRole[]>([])
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState(false)
   const [editingUser, setEditingUser] = useState<SysUser | null>(null)
   const [pwdModalOpen, setPwdModalOpen] = useState(false)
+  const [pwdConfirmLoading, setPwdConfirmLoading] = useState(false)
   const [pwdUserId, setPwdUserId] = useState<number | null>(null)
 
   const [form] = Form.useForm()
   const [pwdForm] = Form.useForm()
   const [searchForm] = Form.useForm()
 
-  const fetchData = useCallback(async (q: UserQuery) => {
-    setLoading(true)
-    try {
-      const res = await getUsers(q)
-      setData(res.records)
-      setTotal(res.total)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
   useEffect(() => {
     fetchData(query)
-    getDeptTree().then((tree) => setDeptTree(toDeptTreeData(tree)))
-    getRoles({ pageNum: 1, pageSize: 100 }).then((res) => setRoles(res.records))
   }, [fetchData, query])
 
-  const handleSearch = (values: UserQuery) => {
-    const newQuery = { ...values, pageNum: 1, pageSize: PAGE_SIZE }
-    setQuery(newQuery)
+  const [formOptionsLoaded, setFormOptionsLoaded] = useState(false)
+
+  const ensureFormOptions = async () => {
+    if (formOptionsLoaded) return
+    const [tree, roleRes] = await Promise.all([
+      getDeptTree(),
+      getRoles({ pageNum: 1, pageSize: 100 }),
+    ])
+    setDeptTree(toDeptTreeData(tree))
+    setRoles(roleRes.records)
+    setFormOptionsLoaded(true)
   }
 
-  const openCreate = () => {
+  const handleSearch = (values: UserQuery) => {
+    setQuery({ ...values, pageNum: 1, pageSize: query.pageSize ?? DEFAULT_PAGE_SIZE })
+  }
+
+  const openCreate = async () => {
+    await ensureFormOptions()
     setEditingUser(null)
     form.resetFields()
     setModalOpen(true)
   }
 
-  const openEdit = (record: SysUser) => {
+  const openEdit = async (record: SysUser) => {
+    await ensureFormOptions()
+    const detail = await getUserDetail(record.id)
     setEditingUser(record)
     form.setFieldsValue({
-      deptId: record.deptId,
-      nickname: record.nickname,
-      email: record.email,
-      phone: record.phone,
-      status: record.status,
-      remark: record.remark,
+      deptId: detail.deptId,
+      nickname: detail.nickname,
+      email: detail.email,
+      phone: detail.phone,
+      status: detail.status,
+      remark: detail.remark,
+      roleIds: detail.roleIds ?? [],
     })
     setModalOpen(true)
   }
 
   const handleModalOk = async () => {
     const values = await form.validateFields()
-    if (editingUser) {
-      await updateUser(editingUser.id, values)
-    } else {
-      await createUser(values)
+    setConfirmLoading(true)
+    try {
+      if (editingUser) {
+        await updateUser(editingUser.id, values)
+      } else {
+        await createUser(values)
+      }
+      setModalOpen(false)
+      fetchData(query)
+    } finally {
+      setConfirmLoading(false)
     }
-    setModalOpen(false)
-    fetchData(query)
   }
 
   const handleDelete = async (id: number) => {
@@ -119,8 +129,13 @@ export default function UserPage() {
 
   const handlePwdOk = async () => {
     const { password } = await pwdForm.validateFields()
-    if (pwdUserId) await resetPassword(pwdUserId, password)
-    setPwdModalOpen(false)
+    setPwdConfirmLoading(true)
+    try {
+      if (pwdUserId) await resetPassword(pwdUserId, password)
+      setPwdModalOpen(false)
+    } finally {
+      setPwdConfirmLoading(false)
+    }
   }
 
   const columns: ColumnsType<SysUser> = [
@@ -132,7 +147,7 @@ export default function UserPage() {
       title: '状态',
       dataIndex: 'status',
       width: 80,
-      render: (v: number) => <Tag color={v === 1 ? 'success' : 'error'}>{v === 1 ? '启用' : '禁用'}</Tag>,
+      render: (v: number) => <StatusTag value={v} />,
     },
     { title: '创建时间', dataIndex: 'createTime', width: 170 },
     {
@@ -181,7 +196,7 @@ export default function UserPage() {
           <Col>
             <Space>
               <Button htmlType="submit" type="primary">搜索</Button>
-              <Button onClick={() => { searchForm.resetFields(); setQuery({ pageNum: 1, pageSize: PAGE_SIZE }) }}>重置</Button>
+              <Button onClick={() => { searchForm.resetFields(); setQuery({ pageNum: 1, pageSize: DEFAULT_PAGE_SIZE }) }}>重置</Button>
             </Space>
           </Col>
           <Col flex="auto" style={{ textAlign: 'right' }}>
@@ -212,6 +227,7 @@ export default function UserPage() {
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={() => setModalOpen(false)}
+        confirmLoading={confirmLoading}
         destroyOnHidden
       >
         <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
@@ -220,7 +236,7 @@ export default function UserPage() {
               <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
-              <Form.Item name="password" label="密码" rules={[{ required: true }]}>
+              <Form.Item name="password" label="密码" rules={[{ required: true, min: 6 }]}>
                 <Input.Password />
               </Form.Item>
             </>
@@ -261,6 +277,7 @@ export default function UserPage() {
         open={pwdModalOpen}
         onOk={handlePwdOk}
         onCancel={() => setPwdModalOpen(false)}
+        confirmLoading={pwdConfirmLoading}
         destroyOnHidden
       >
         <Form form={pwdForm} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>

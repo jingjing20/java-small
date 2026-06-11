@@ -35,7 +35,7 @@ export interface CurrentUser {
 }
 
 // User
-export interface SysUser {
+export interface UserDetail {
   id: number
   deptId: number
   username: string
@@ -44,8 +44,10 @@ export interface SysUser {
   phone: string
   status: number
   remark: string
-  createTime: string
+  roleIds?: number[]
 }
+
+export type SysUser = UserDetail
 
 export interface UserQuery extends PageQuery {
   username?: string
@@ -103,8 +105,24 @@ export interface MenuTreeNode {
   path?: string
   component?: string
   permission?: string
+  icon?: string
   sort?: number
+  visible?: number
+  status?: number
   children: MenuTreeNode[]
+}
+
+export interface MenuRequest {
+  parentId: number
+  menuName: string
+  menuType: string
+  path?: string
+  component?: string
+  permission?: string
+  icon?: string
+  sort?: number
+  visible: number
+  status: number
 }
 
 // Dept
@@ -113,8 +131,19 @@ export interface DeptTreeNode {
   parentId: number
   deptName: string
   sort?: number
+  leader?: string
+  phone?: string
   status?: number
   children: DeptTreeNode[]
+}
+
+export interface DeptRequest {
+  parentId: number
+  deptName: string
+  sort?: number
+  leader?: string
+  phone?: string
+  status: number
 }
 
 // Dict

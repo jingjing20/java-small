@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AdminLayout from '@/layouts/AdminLayout'
 import AuthGuard from './AuthGuard'
 import LoginPage from '@/pages/login/LoginPage'
+import NotFoundPage from '@/pages/NotFoundPage'
 import UserPage from '@/pages/system/user/UserPage'
 import RolePage from '@/pages/system/role/RolePage'
 import MenuPage from '@/pages/system/menu/MenuPage'
@@ -19,13 +20,14 @@ const router = createBrowserRouter([
       </AuthGuard>
     ),
     children: [
-      { index: true, element: <Navigate to="/system/user" replace /> },
-      { path: 'system/user', element: <UserPage /> },
-      { path: 'system/role', element: <RolePage /> },
-      { path: 'system/menu', element: <MenuPage /> },
-      { path: 'system/dept', element: <DeptPage /> },
-      { path: 'system/dict', element: <DictPage /> },
-      { path: 'system/log', element: <LogPage /> },
+      { index: true, element: <Navigate to="/system/users" replace /> },
+      { path: 'system/users', element: <UserPage /> },
+      { path: 'system/roles', element: <RolePage /> },
+      { path: 'system/menus', element: <MenuPage /> },
+      { path: 'system/depts', element: <DeptPage /> },
+      { path: 'system/dicts', element: <DictPage /> },
+      { path: 'system/operation-logs', element: <LogPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
