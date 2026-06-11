@@ -14,6 +14,7 @@ import com.zhihao.admin.module.system.entity.SysUserRole;
 import com.zhihao.admin.module.system.mapper.SysUserMapper;
 import com.zhihao.admin.module.system.mapper.SysUserRoleMapper;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -118,11 +119,15 @@ public class UserService {
         if (roleIds == null || roleIds.isEmpty()) {
             return;
         }
-        roleIds.stream().distinct().forEach(roleId -> {
-            SysUserRole userRole = new SysUserRole();
-            userRole.setUserId(userId);
-            userRole.setRoleId(roleId);
-            userRoleMapper.insert(userRole);
-        });
+        List<SysUserRole> userRoles = roleIds.stream()
+                .distinct()
+                .map(roleId -> {
+                    SysUserRole ur = new SysUserRole();
+                    ur.setUserId(userId);
+                    ur.setRoleId(roleId);
+                    return ur;
+                })
+                .collect(Collectors.toList());
+        userRoleMapper.insertBatch(userRoles);
     }
 }
