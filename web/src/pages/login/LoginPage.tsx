@@ -31,7 +31,7 @@ export default function LoginPage() {
         <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: 32 }}>
           后台管理系统
         </Typography.Title>
-        <Form form={form} onFinish={handleSubmit} size="large">
+        <Form form={form} onFinish={handleSubmit} size="large" layout="horizontal" labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
           <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
             <Input prefix={<UserOutlined />} placeholder="用户名" />
           </Form.Item>

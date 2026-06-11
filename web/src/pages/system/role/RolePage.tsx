@@ -171,9 +171,9 @@ export default function RolePage() {
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={() => setModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           <Form.Item name="roleCode" label="角色编码" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -201,7 +201,7 @@ export default function RolePage() {
         onOk={handleMenuOk}
         onCancel={() => setMenuModalOpen(false)}
         width={480}
-        destroyOnClose
+        destroyOnHidden
       >
         <Tree
           checkable

@@ -146,9 +146,9 @@ export default function DictPage() {
         open={typeModalOpen}
         onOk={handleCreateType}
         onCancel={() => setTypeModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
-        <Form form={typeForm} layout="vertical">
+        <Form form={typeForm} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           <Form.Item name="dictName" label="字典名称" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -202,9 +202,9 @@ export default function DictPage() {
         open={dataModalOpen}
         onOk={handleCreateData}
         onCancel={() => setDataModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
-        <Form form={dataForm} layout="vertical">
+        <Form form={dataForm} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           <Form.Item name="dictLabel" label="标签" rules={[{ required: true }]}>
             <Input />
           </Form.Item>

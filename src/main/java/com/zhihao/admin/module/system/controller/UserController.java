@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/system/users")
+@RequestMapping("/api/system/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -31,7 +31,8 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAuthority('system:user:list')")
     public ApiResponse<PageResult<SysUser>> page(@Valid UserQuery query) {
-        return ApiResponse.ok(userService.page(query));
+        PageResult<SysUser> res = userService.page(query);
+        return ApiResponse.ok(res);
     }
 
     @PostMapping

@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS spring_admin DEFAULT CHARACTER SET utf8mb4 COLLATE
 USE spring_admin;
 
 CREATE TABLE IF NOT EXISTS sys_dept (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     parent_id BIGINT NOT NULL DEFAULT 0,
     dept_name VARCHAR(64) NOT NULL,
     sort INT DEFAULT 0,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS sys_dept (
 );
 
 CREATE TABLE IF NOT EXISTS sys_user (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     dept_id BIGINT,
     username VARCHAR(64) NOT NULL,
     nickname VARCHAR(64) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
 );
 
 CREATE TABLE IF NOT EXISTS sys_role (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     role_code VARCHAR(64) NOT NULL,
     role_name VARCHAR(64) NOT NULL,
     sort INT DEFAULT 0,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS sys_role (
 );
 
 CREATE TABLE IF NOT EXISTS sys_menu (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     parent_id BIGINT NOT NULL DEFAULT 0,
     menu_name VARCHAR(64) NOT NULL,
     menu_type VARCHAR(16) NOT NULL,
@@ -69,21 +69,21 @@ CREATE TABLE IF NOT EXISTS sys_menu (
 );
 
 CREATE TABLE IF NOT EXISTS sys_user_role (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     UNIQUE KEY uk_sys_user_role (user_id, role_id)
 );
 
 CREATE TABLE IF NOT EXISTS sys_role_menu (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     role_id BIGINT NOT NULL,
     menu_id BIGINT NOT NULL,
     UNIQUE KEY uk_sys_role_menu (role_id, menu_id)
 );
 
 CREATE TABLE IF NOT EXISTS sys_dict_type (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     dict_name VARCHAR(64) NOT NULL,
     dict_type VARCHAR(64) NOT NULL,
     status TINYINT NOT NULL DEFAULT 1,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS sys_dict_type (
 );
 
 CREATE TABLE IF NOT EXISTS sys_dict_data (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     dict_type_id BIGINT NOT NULL,
     dict_label VARCHAR(64) NOT NULL,
     dict_value VARCHAR(64) NOT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS sys_dict_data (
 );
 
 CREATE TABLE IF NOT EXISTS sys_oper_log (
-    id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(64),
     business_type VARCHAR(64),
     method VARCHAR(255),

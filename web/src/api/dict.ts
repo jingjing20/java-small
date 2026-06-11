@@ -12,10 +12,10 @@ export const getDictTypes = (params?: PageQuery) =>
   request.get<unknown, PageResult<SysDictType>>('/system/dict-types', { params })
 
 export const createDictType = (data: DictTypeRequest) =>
-  request.post<unknown, number>('/system/dict-types', data)
+  request.post<unknown, number>('/system/dict-types', data, { successMessage: '新增成功' })
 
 export const getDictData = (params?: PageQuery & { dictTypeId?: number }) =>
   request.get<unknown, PageResult<SysDictData>>('/system/dict-data', { params })
 
 export const createDictData = (data: DictDataRequest) =>
-  request.post<unknown, number>('/system/dict-data', data)
+  request.post<unknown, number>('/system/dict-data', data, { successMessage: '新增成功' })

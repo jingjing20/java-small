@@ -1,6 +1,12 @@
 import axios from 'axios'
 import { message } from 'antd'
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    successMessage?: string
+  }
+}
+
 const request = axios.create({ baseURL: '/api', timeout: 15000 })
 
 request.interceptors.request.use((config) => {
@@ -17,6 +23,10 @@ request.interceptors.response.use(
     if (res.code !== 0) {
       message.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message))
+    }
+    const successMessage = response.config.successMessage
+    if (successMessage) {
+      message.success(successMessage)
     }
     return res.data
   },

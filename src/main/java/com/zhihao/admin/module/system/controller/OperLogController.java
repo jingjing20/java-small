@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/system/operation-logs")
+@RequestMapping("/api/system/operation-logs")
 @RequiredArgsConstructor
 public class OperLogController {
 

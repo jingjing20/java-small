@@ -158,7 +158,7 @@ export default function UserPage() {
 
   return (
     <>
-      <Form form={searchForm} onFinish={handleSearch} layout="inline" style={{ marginBottom: 16 }}>
+      <Form form={searchForm} onFinish={handleSearch} layout="horizontal" style={{ marginBottom: 16 }}>
         <Row gutter={[8, 8]} style={{ width: '100%' }}>
           <Col>
             <Form.Item name="username">
@@ -212,9 +212,9 @@ export default function UserPage() {
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={() => setModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           {!editingUser && (
             <>
               <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
@@ -261,9 +261,9 @@ export default function UserPage() {
         open={pwdModalOpen}
         onOk={handlePwdOk}
         onCancel={() => setPwdModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
-        <Form form={pwdForm} layout="vertical">
+        <Form form={pwdForm} layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           <Form.Item name="password" label="新密码" rules={[{ required: true, min: 6 }]}>
             <Input.Password />
           </Form.Item>
