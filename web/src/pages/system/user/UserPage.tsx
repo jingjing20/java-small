@@ -28,6 +28,7 @@ import type { SysUser, UserQuery, DeptTreeNode, SysRole } from '@/api/types'
 import AuthButton from '@/components/AuthButton'
 import StatusTag from '@/components/StatusTag'
 import { DEFAULT_PAGE_SIZE, usePageTable } from '@/hooks/usePageTable'
+import { emailRule, phoneRule } from '@/utils/validation'
 
 function toDeptTreeData(nodes: DeptTreeNode[]): object[] {
   return nodes.map((n) => ({
@@ -254,10 +255,10 @@ export default function UserPage() {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="email" label="邮箱">
+          <Form.Item name="email" label="邮箱" rules={[emailRule]}>
             <Input />
           </Form.Item>
-          <Form.Item name="phone" label="手机">
+          <Form.Item name="phone" label="手机" rules={[phoneRule]}>
             <Input />
           </Form.Item>
           <Form.Item name="status" label="状态" initialValue={1} rules={[{ required: true }]}>
