@@ -14,7 +14,6 @@ import com.zhihao.admin.module.system.entity.SysUserRole;
 import com.zhihao.admin.module.system.mapper.SysUserMapper;
 import com.zhihao.admin.module.system.mapper.SysUserRoleMapper;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -90,6 +89,7 @@ public class UserService {
         userMapper.deleteById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void resetPassword(Long id, PasswordResetRequest request) {
         SysUser user = requireUser(id);
         user.setPassword(passwordEncoder.encode(request.password()));
@@ -127,7 +127,7 @@ public class UserService {
                     ur.setRoleId(roleId);
                     return ur;
                 })
-                .collect(Collectors.toList());
+                .toList();
         userRoleMapper.insertBatch(userRoles);
     }
 }

@@ -1,6 +1,7 @@
 package com.zhihao.admin.module.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.zhihao.admin.common.constant.MenuType;
 import com.zhihao.admin.common.constant.SystemConstants;
 import com.zhihao.admin.common.exception.BusinessException;
 import com.zhihao.admin.common.util.TreeUtils;
@@ -68,10 +69,10 @@ public class MenuService {
     }
 
     private void validateMenuRequest(MenuRequest request) {
-        if ("B".equals(request.menuType()) && !StringUtils.hasText(request.permission())) {
+        if (MenuType.BUTTON.equals(request.menuType()) && !StringUtils.hasText(request.permission())) {
             throw new BusinessException("button menu requires permission");
         }
-        if ("C".equals(request.menuType()) && !StringUtils.hasText(request.path())) {
+        if (MenuType.PAGE.equals(request.menuType()) && !StringUtils.hasText(request.path())) {
             throw new BusinessException("page menu requires path");
         }
     }

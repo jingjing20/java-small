@@ -62,12 +62,15 @@ public class RoleService {
     public void updateMenus(Long roleId, RoleMenuUpdateRequest request) {
         requireRole(roleId);
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
-        request.menuIds().stream().distinct().forEach(menuId -> {
+        List<SysRoleMenu> roleMenus = request.menuIds().stream().distinct().map(menuId -> {
             SysRoleMenu roleMenu = new SysRoleMenu();
             roleMenu.setRoleId(roleId);
             roleMenu.setMenuId(menuId);
-            roleMenuMapper.insert(roleMenu);
-        });
+            return roleMenu;
+        }).toList();
+        if (!roleMenus.isEmpty()) {
+            roleMenuMapper.insertBatch(roleMenus);
+        }
     }
 
     public List<Long> getMenuIds(Long roleId) {
