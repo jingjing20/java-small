@@ -12,7 +12,7 @@ public record UserCreateRequest(
         @NotBlank String username,
         @NotBlank String nickname,
         @NotBlank @Size(min = 6, max = 32) String password,
-        @Email(regexp = "^$|.+@.+\\..+") String email,
+        @Email(regexp = "^$|.+@.+\\..+", message = "invalid email") String email,
         @Pattern(regexp = "^$|^1[3-9]\\d{9}$", message = "invalid phone number") String phone,
         @NotNull Integer status,
         String remark,
