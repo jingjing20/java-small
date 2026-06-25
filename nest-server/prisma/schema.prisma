@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SysDept {
+  id         BigInt    @id @default(autoincrement())
+  parentId   BigInt    @default(0) @map("parent_id")
+  deptName   String    @map("dept_name") @db.VarChar(64)
+  sort       Int?      @default(0)
+  leader     String?   @db.VarChar(64)
+  phone      String?   @db.VarChar(32)
+  status     Int       @default(1) @db.TinyInt
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_dept")
+}
+
+model SysUser {
+  id         BigInt    @id @default(autoincrement())
+  deptId     BigInt?   @map("dept_id")
+  username   String    @unique @db.VarChar(64)
+  nickname   String    @db.VarChar(64)
+  password   String    @db.VarChar(128)
+  email      String?   @db.VarChar(128)
+  phone      String?   @db.VarChar(32)
+  status     Int       @default(1) @db.TinyInt
+  remark     String?   @db.VarChar(255)
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_user")
+}
+
+model SysRole {
+  id         BigInt    @id @default(autoincrement())
+  roleCode   String    @unique @map("role_code") @db.VarChar(64)
+  roleName   String    @map("role_name") @db.VarChar(64)
+  sort       Int?      @default(0)
+  status     Int       @default(1) @db.TinyInt
+  remark     String?   @db.VarChar(255)
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_role")
+}
+
+model SysMenu {
+  id         BigInt    @id @default(autoincrement())
+  parentId   BigInt    @default(0) @map("parent_id")
+  menuName   String    @map("menu_name") @db.VarChar(64)
+  menuType   String    @map("menu_type") @db.VarChar(16)
+  path       String?   @db.VarChar(128)
+  component  String?   @db.VarChar(128)
+  permission String?   @db.VarChar(128)
+  icon       String?   @db.VarChar(64)
+  sort       Int?      @default(0)
+  visible    Int       @default(1) @db.TinyInt
+  status     Int       @default(1) @db.TinyInt
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_menu")
+}
+
+model SysUserRole {
+  id     BigInt @id @default(autoincrement())
+  userId BigInt @map("user_id")
+  roleId BigInt @map("role_id")
+
+  @@unique([userId, roleId], map: "uk_sys_user_role")
+  @@map("sys_user_role")
+}
+
+model SysRoleMenu {
+  id     BigInt @id @default(autoincrement())
+  roleId BigInt @map("role_id")
+  menuId BigInt @map("menu_id")
+
+  @@unique([roleId, menuId], map: "uk_sys_role_menu")
+  @@map("sys_role_menu")
+}
+
+model SysDictType {
+  id         BigInt    @id @default(autoincrement())
+  dictName   String    @map("dict_name") @db.VarChar(64)
+  dictType   String    @unique @map("dict_type") @db.VarChar(64)
+  status     Int       @default(1) @db.TinyInt
+  remark     String?   @db.VarChar(255)
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_dict_type")
+}
+
+model SysDictData {
+  id         BigInt    @id @default(autoincrement())
+  dictTypeId BigInt    @map("dict_type_id")
+  dictLabel  String    @map("dict_label") @db.VarChar(64)
+  dictValue  String    @map("dict_value") @db.VarChar(64)
+  sort       Int?      @default(0)
+  status     Int       @default(1) @db.TinyInt
+  remark     String?   @db.VarChar(255)
+  createTime DateTime? @map("create_time")
+  updateTime DateTime? @map("update_time")
+  createBy   BigInt?   @map("create_by")
+  updateBy   BigInt?   @map("update_by")
+  deleted    Int       @default(0) @db.TinyInt
+
+  @@map("sys_dict_data")
+}
+
+model SysOperLog {
+  id            BigInt    @id @default(autoincrement())
+  title         String?   @db.VarChar(64)
+  businessType  String?   @map("business_type") @db.VarChar(64)
+  method        String?   @db.VarChar(255)
+  requestMethod String?   @map("request_method") @db.VarChar(16)
+  requestUri    String?   @map("request_uri") @db.VarChar(255)
+  operatorName  String?   @map("operator_name") @db.VarChar(64)
+  operatorId    BigInt?   @map("operator_id")
+  operatorIp    String?   @map("operator_ip") @db.VarChar(64)
+  status        Int?      @db.TinyInt
+  errorMessage  String?   @map("error_message") @db.VarChar(512)
+  costMillis    BigInt?   @map("cost_millis")
+  createTime    DateTime? @map("create_time")
+  updateTime    DateTime? @map("update_time")
+  createBy      BigInt?   @map("create_by")
+  updateBy      BigInt?   @map("update_by")
+  deleted       Int       @default(0) @db.TinyInt
+
+  @@map("sys_oper_log")
+}
